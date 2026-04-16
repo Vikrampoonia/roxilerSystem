@@ -207,6 +207,59 @@ class UserService {
         };
     }
 
+    async getStoreRatingsSummary({ ownerId, filters = {} }) {
+        const store = await Store.findOne({ where: { owner_id: ownerId } });
+
+        if (!store) {
+            throw new Error(messages.ownerStoreNotFound);
+        }
+
+        const pageLimit = Number(filters.pageLimit || 10);
+        const page = Number(filters.page || 1);
+        const offset = (page - 1) * pageLimit;
+
+        const averageRatingRow = await Rating.findOne({
+            where: { store_id: store.id },
+            attributes: [[fn("COALESCE", fn("AVG", col("rating_value")), 0), "averageRating"]],
+            raw: true,
+        });
+
+        const { rows, count } = await Rating.findAndCountAll({
+            where: { store_id: store.id },
+            include: [
+                {
+                    model: User,
+                    as: "user",
+                    attributes: ["id", "name", "email", "address", "role"],
+                },
+            ],
+            attributes: ["id", "rating_value", "createdAt"],
+            order: [["createdAt", "DESC"]],
+            limit: pageLimit,
+            offset,
+        });
+
+        const list = rows.map((rating) => ({
+            userId: rating.user?.id,
+            name: rating.user?.name,
+            email: rating.user?.email,
+            address: rating.user?.address,
+            role: rating.user?.role,
+            submittedRating: rating.rating_value,
+            submittedAt: rating.createdAt,
+        }));
+
+        return {
+            storeName: store.name,
+            averageRating: Number(averageRatingRow?.averageRating || 0),
+            list,
+            total: count,
+            page,
+            pageLimit,
+            totalPages: Math.ceil(count / pageLimit),
+        };
+    }
+
     async updateProfile({ userId, name, address, password }) {
         const user = await User.findByPk(userId);
 

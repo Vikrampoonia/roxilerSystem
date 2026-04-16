@@ -68,6 +68,13 @@ export const getStoreForUserFilterSchema = z
     })
     .optional();
 
+export const storeRatingsSummaryFilterSchema = z
+    .object({
+        page: z.coerce.number().int().min(1).optional(),
+        pageLimit: z.coerce.number().int().min(1).max(100).optional(),
+    })
+    .optional();
+
 export const createStoreSchema = z.object({
     name: z.string().min(1).max(60),
     email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid),

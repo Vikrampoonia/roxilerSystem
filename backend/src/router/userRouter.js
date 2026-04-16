@@ -52,6 +52,15 @@ router.post("/get-store", auth, authorize(constants.roles.normalUser), async (re
     res.status(data.status).send(data);
 });
 
+router.get("/store-ratings-summary", auth, authorize(constants.roles.storeOwner), async (req, res) => {
+    const { filters } = req.query;
+    const data = await userController.getStoreRatingsSummary({
+        ownerId: req.user.id,
+        filters,
+    });
+    res.status(data.status).send(data);
+});
+
 router.put("/update-profile", auth, async (req, res) => {
     const { name, address, password } = req.body;
     const userId = req.user.id;

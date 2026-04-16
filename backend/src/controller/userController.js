@@ -8,6 +8,7 @@ import {
     getStoreForUserFilterSchema,
     getUserByIdSchema,
     getUserFilterSchema,
+    storeRatingsSummaryFilterSchema,
     updateProfileSchema,
     updateRatingSchema,
 } from "../utils/validation.js";
@@ -172,6 +173,35 @@ class UserController {
             return res;
         } catch (err) {
             res.status = httpStatus.serverError;
+            res.message = err.message || messages.unableToSignup;
+            return res;
+        }
+    }
+
+    async getStoreRatingsSummary({ ownerId, filters }) {
+        const res = new Result();
+        const { httpStatus } = constants;
+
+        try {
+            const validationResult = storeRatingsSummaryFilterSchema.safeParse(filters);
+
+            if (!validationResult.success) {
+                res.status = httpStatus.badRequest;
+                res.message = validationResult.error.issues[0]?.message || messages.invalidSignupCredentials;
+                return res;
+            }
+
+            const data = await userService.getStoreRatingsSummary({
+                ownerId,
+                filters: validationResult.data || {},
+            });
+
+            res.status = httpStatus.success;
+            res.message = messages.storeRatingsSummaryFetchedSuccessfully;
+            res.data = data;
+            return res;
+        } catch (err) {
+            res.status = err.message === messages.ownerStoreNotFound ? httpStatus.notFound : httpStatus.serverError;
             res.message = err.message || messages.unableToSignup;
             return res;
         }
