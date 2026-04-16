@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import authRouter from './router/authRouter.js';
 import userRouter from './router/userRouter.js';
 import storeRouter from './router/storeRouter.js';
-import adminRouter from './router/adminRouter.js';
+import dashboardRouter from './router/dashboardRouter.js';
 import './modals/index.js';
 
 dotenv.config();
@@ -17,7 +17,7 @@ app.use(cors());
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/store", storeRouter);
-app.use("/api/admin", adminRouter);
+app.use("/api/admin", dashboardRouter);
 
 const PORT = process.env.PORT || 5001;
 
