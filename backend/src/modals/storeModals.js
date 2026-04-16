@@ -12,7 +12,7 @@ const Store = sequelize.define('Store', {
         validate: { isEmail: true },
     },
     address: {
-        type: DataTypes.STRING(400), 
+        type: DataTypes.STRING(400),
         allowNull: false,
     },
     owner_id: {
@@ -22,7 +22,17 @@ const Store = sequelize.define('Store', {
             model: 'Users',
             key: 'id'
         }
-    }
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
 });
 
 export default Store;

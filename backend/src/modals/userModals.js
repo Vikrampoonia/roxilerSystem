@@ -10,7 +10,7 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
-        validate: { isEmail: true } 
+        validate: { isEmail: true }
     },
     password: {
         type: DataTypes.STRING,
@@ -23,7 +23,17 @@ const User = sequelize.define('User', {
     role: {
         type: DataTypes.ENUM('System Administrator', 'Normal User', 'Store Owner'),
         defaultValue: 'Normal User',
-    }
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
 });
 
 export default User;

@@ -49,7 +49,7 @@ export const createStoreSchema = z.object({
     name: z.string().min(1).max(60),
     email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid),
     address: z.string().max(constants.limits.ADDRESS_MAX, messages.validation.addressTooLong),
-    owner_id: z.coerce.number().int().positive().optional(),
+    owner_email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid),
 });
 
 export const getStoreFilterSchema = z
@@ -73,5 +73,5 @@ export const updateProfileSchema = z.object({
         .regex(constants.regex.PASSWORD_SPECIAL, messages.validation.passwordSpecial)
         .optional(),
 }).refine((data) => data.name || data.address || data.password, {
-    message:  messages.validation.atLeastOneFieldRequired,
+    message: messages.validation.atLeastOneFieldRequired,
 });
