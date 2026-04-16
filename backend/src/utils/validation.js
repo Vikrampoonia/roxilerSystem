@@ -1,26 +1,77 @@
 import { z } from "zod";
+import constants from "../constant/constants.js";
+import messages from "../constant/message.js";
 
-const LIMITS = {
-    NAME_MIN: 20,
-    NAME_MAX: 60,
-    ADDRESS_MAX: 400,
-    PASS_MIN: 8,
-    PASS_MAX: 16,
-};
+const EMAIL_REGEX = constants.regex.EMAIL;
 
 export const signupSchema = z.object({
-    name: z.string().min(LIMITS.NAME_MIN).max(LIMITS.NAME_MAX),
-    email: z.string().email(),
-    address: z.string().max(LIMITS.ADDRESS_MAX),
+    name: z.string().min(constants.limits.NAME_MIN, messages.validation.nameTooShort).max(constants.limits.NAME_MAX, messages.validation.nameTooLong),
+    email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid),
+    address: z.string().max(constants.limits.ADDRESS_MAX, messages.validation.addressTooLong),
     password: z
         .string()
-        .min(LIMITS.PASS_MIN)
-        .max(LIMITS.PASS_MAX)
-        .regex(/[A-Z]/, "Must have one uppercase")
-        .regex(/[!@#$%^&*]/, "Must have one special character"),
+        .min(constants.limits.PASS_MIN, messages.validation.passwordTooShort)
+        .max(constants.limits.PASS_MAX, messages.validation.passwordTooLong)
+        .regex(constants.regex.PASSWORD_UPPERCASE, messages.validation.passwordUppercase)
+        .regex(constants.regex.PASSWORD_SPECIAL, messages.validation.passwordSpecial),
 });
 
 export const loginSchema = z.object({
-    email: z.string().email(),
+    email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid),
     password: z.string().min(1),
+});
+
+export const createUserSchema = z.object({
+    name: z.string().min(constants.limits.NAME_MIN, messages.validation.nameTooShort).max(constants.limits.NAME_MAX, messages.validation.nameTooLong),
+    email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid),
+    address: z.string().max(constants.limits.ADDRESS_MAX, messages.validation.addressTooLong),
+    password: z
+        .string()
+        .min(constants.limits.PASS_MIN, messages.validation.passwordTooShort)
+        .max(constants.limits.PASS_MAX, messages.validation.passwordTooLong)
+        .regex(constants.regex.PASSWORD_UPPERCASE, messages.validation.passwordUppercase)
+        .regex(constants.regex.PASSWORD_SPECIAL, messages.validation.passwordSpecial),
+    role: z.enum([constants.roles.systemAdministrator, constants.roles.normalUser, constants.roles.storeOwner]).optional().default(constants.roles.normalUser),
+});
+
+export const getUserFilterSchema = z
+    .object({
+        name: z.string().optional(),
+        email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid).optional(),
+        address: z.string().optional(),
+        role: z.enum([constants.roles.systemAdministrator, constants.roles.normalUser, constants.roles.storeOwner]).optional(),
+        page: z.coerce.number().int().min(1).optional(),
+        pageLimit: z.coerce.number().int().min(1).max(100).optional(),
+    })
+    .optional();
+
+export const createStoreSchema = z.object({
+    name: z.string().min(1).max(60),
+    email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid),
+    address: z.string().max(constants.limits.ADDRESS_MAX, messages.validation.addressTooLong),
+    owner_id: z.coerce.number().int().positive().optional(),
+});
+
+export const getStoreFilterSchema = z
+    .object({
+        name: z.string().optional(),
+        email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid).optional(),
+        address: z.string().optional(),
+        page: z.coerce.number().int().min(1).optional(),
+        pageLimit: z.coerce.number().int().min(1).max(100).optional(),
+    })
+    .optional();
+
+export const updateProfileSchema = z.object({
+    name: z.string().min(constants.limits.NAME_MIN, messages.validation.nameTooShort).max(constants.limits.NAME_MAX, messages.validation.nameTooLong).optional(),
+    address: z.string().max(constants.limits.ADDRESS_MAX, messages.validation.addressTooLong).optional(),
+    password: z
+        .string()
+        .min(constants.limits.PASS_MIN, messages.validation.passwordTooShort)
+        .max(constants.limits.PASS_MAX, messages.validation.passwordTooLong)
+        .regex(constants.regex.PASSWORD_UPPERCASE, messages.validation.passwordUppercase)
+        .regex(constants.regex.PASSWORD_SPECIAL, messages.validation.passwordSpecial)
+        .optional(),
+}).refine((data) => data.name || data.address || data.password, {
+    message:  messages.validation.atLeastOneFieldRequired,
 });

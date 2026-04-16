@@ -1,6 +1,6 @@
-import User from './User.js';
-import Store from './Store.js';
-import Rating from './Rating.js';
+import User from './userModals.js';
+import Store from './storeModals.js';
+import Rating from './ratingModals.js';
 
 // Store <-> User
 Store.belongsTo(User, { foreignKey: 'owner_id', as: 'owner' });

@@ -1,5 +1,19 @@
 class Constants {
-    constructor () {
+    constructor() {
+        this.limits = {
+            NAME_MIN: 20,
+            NAME_MAX: 60,
+            ADDRESS_MAX: 400,
+            PASS_MIN: 8,
+            PASS_MAX: 16,
+        };
+
+        this.regex = {
+            EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            PASSWORD_UPPERCASE: /[A-Z]/,
+            PASSWORD_SPECIAL: /[!@#$%^&*]/,
+        };
+
         this.httpStatus = {
             success: 200,
             created: 201,
@@ -15,7 +29,13 @@ class Constants {
             serviceUnavailable: 503,
             modified: 302,
         };
+
+        this.roles = {
+            systemAdministrator: "System Administrator",
+            normalUser: "Normal User",
+            storeOwner: "Store Owner",
+        };
     }
 };
- 
+
 export default new Constants();

@@ -1,38 +1,49 @@
 import User from '../modals/userModals.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import redis from '../config/redis.js';
 
 class AuthService {
 
-    async logIn({email, password}) {
+    async logIn({ email, password }) {
         const user = await User.findOne({ where: { email } });
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
             throw new Error('Invalid credentials');
         }
-
+        const payload = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        }
         const accessToken = jwt.sign(
-            { id: user.id, role: user.role }, 
-            process.env.JWT_SECRET, 
+            payload,
+            process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        
+
         return { user, accessToken };
     }
 
-    async signUp({userData}) {
+    async signUp({ userData }) {
         const hashedPassword = await bcrypt.hash(userData.password, 10);
         return await User.create({ ...userData, password: hashedPassword });
     }
 
-    async logOut({req}) {
+    async logOut({ req }) {
         const authHeader = req.headers.authorization;
         const token = authHeader?.split(' ')[1];
 
-        if (!token) return res.status(400).json({ message: "No token provided" });
+        if (!token) {
+            throw new Error("No token provided");
+        }
 
         // Decode token to get remaining life
         const decoded = jwt.decode(token);
+        if (!decoded?.exp) {
+            return { success: true };
+        }
         const now = Math.floor(Date.now() / 1000);
         const ttl = decoded.exp - now; // Remaining seconds
 
@@ -40,6 +51,8 @@ class AuthService {
             // Store token in Redis with calculated TTL
             await redis.setex(`blacklist:${token}`, ttl, 'true');
         }
+
+        return { success: true };
     }
 }
 

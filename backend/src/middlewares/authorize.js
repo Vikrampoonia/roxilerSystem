@@ -1,12 +1,6 @@
-import type { NextFunction, Request, Response } from "express";
-import type { AuthUser } from "./auth.js";
-import { USER_ROLES } from "../models/constants.js";
-
-type AllowedRole = (typeof USER_ROLES)[number];
-
-const authorize = (...allowedRoles: AllowedRole[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        const user = req.user as AuthUser | undefined;
+const authorize = (...allowedRoles) => {
+    return (req, res, next) => {
+        const user = req.user;
 
         if (!user) {
             return res.status(401).send({

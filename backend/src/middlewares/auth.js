@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import redis from "../config/redis.js";
 
 
 const auth = async (req, res, next) => {
@@ -24,16 +25,17 @@ const auth = async (req, res, next) => {
 
         const isBlacklisted = await redis.get(`blacklist:${token}`);
         if (isBlacklisted) {
-            return res.status(401).json({ 
-                message: "This session has ended. Please log in again." 
+            return res.status(401).json({
+                message: "This session has ended. Please log in again."
             });
         }
-        
+
         const decoded = jwt.verify(token, jwtSecret);
 
         req.user = {
-            id: decoded.userId,
+            id: decoded.id,
             name: decoded.name,
+            email: decoded.email,
             role: decoded.role,
         };
 
