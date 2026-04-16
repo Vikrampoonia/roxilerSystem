@@ -23,6 +23,35 @@ router.get("/get-user/:id", auth, authorize(constants.roles.systemAdministrator)
     res.status(data.status).send(data);
 });
 
+router.post("/add-rating", auth, authorize(constants.roles.normalUser), async (req, res) => {
+    const { store_id, rating_value } = req.body;
+    const data = await userController.addRating({
+        userId: req.user.id,
+        store_id,
+        rating_value,
+    });
+    res.status(data.status).send(data);
+});
+
+router.put("/update-rating", auth, authorize(constants.roles.normalUser), async (req, res) => {
+    const { store_id, rating_value } = req.body;
+    const data = await userController.updateRating({
+        userId: req.user.id,
+        store_id,
+        rating_value,
+    });
+    res.status(data.status).send(data);
+});
+
+router.post("/get-store", auth, authorize(constants.roles.normalUser), async (req, res) => {
+    const { filters } = req.body;
+    const data = await userController.getStoreForUser({
+        userId: req.user.id,
+        filters,
+    });
+    res.status(data.status).send(data);
+});
+
 router.put("/update-profile", auth, async (req, res) => {
     const { name, address, password } = req.body;
     const userId = req.user.id;

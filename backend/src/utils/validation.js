@@ -49,6 +49,25 @@ export const getUserByIdSchema = z.object({
     id: z.coerce.number().int().positive(),
 });
 
+export const addRatingSchema = z.object({
+    store_id: z.coerce.number().int().positive(),
+    rating_value: z.coerce.number().int().min(1).max(5),
+});
+
+export const updateRatingSchema = z.object({
+    store_id: z.coerce.number().int().positive(),
+    rating_value: z.coerce.number().int().min(1).max(5),
+});
+
+export const getStoreForUserFilterSchema = z
+    .object({
+        name: z.string().optional(),
+        address: z.string().optional(),
+        page: z.coerce.number().int().min(1).optional(),
+        pageLimit: z.coerce.number().int().min(1).max(100).optional(),
+    })
+    .optional();
+
 export const createStoreSchema = z.object({
     name: z.string().min(1).max(60),
     email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid),

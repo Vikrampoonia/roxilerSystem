@@ -14,11 +14,17 @@ class Message {
         this.userDetailFetchedSuccessfully = "User detail fetched successfully";
         this.storeCreatedSuccessfully = "Store created successfully";
         this.storesFetchedSuccessfully = "Stores fetched successfully";
+        this.userStoresFetchedSuccessfully = "Stores fetched successfully";
+        this.ratingAddedSuccessfully = "Rating added successfully";
+        this.ratingUpdatedSuccessfully = "Rating updated successfully";
         this.dashboardSummaryFetchedSuccessfully = "Dashboard summary fetched successfully";
         this.emailAlreadyExists = "Email already exists";
         this.storeEmailAlreadyExists = "Store email already exists";
         this.ownerNotFound = "Store owner not found";
         this.ownerRoleInvalid = "Selected owner must be a Store Owner";
+        this.storeNotFound = "Store not found";
+        this.ratingAlreadySubmitted = "Rating already submitted for this store";
+        this.ratingNotFound = "Rating not found for this store";
         this.profileUpdatedSuccessfully = "Profile updated successfully";
         this.unableToUpdateProfile = "Unable to update profile";
         this.userNotFound = "User not found";

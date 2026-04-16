@@ -102,6 +102,111 @@ class UserService {
         };
     }
 
+    async addRating({ userId, storeId, ratingValue }) {
+        const store = await Store.findByPk(storeId);
+        if (!store) {
+            throw new Error(messages.storeNotFound);
+        }
+
+        const existingRating = await Rating.findOne({
+            where: {
+                user_id: userId,
+                store_id: storeId,
+            },
+        });
+
+        if (existingRating) {
+            throw new Error(messages.ratingAlreadySubmitted);
+        }
+
+        return await Rating.create({
+            user_id: userId,
+            store_id: storeId,
+            rating_value: ratingValue,
+        });
+    }
+
+    async updateRating({ userId, storeId, ratingValue }) {
+        const existingRating = await Rating.findOne({
+            where: {
+                user_id: userId,
+                store_id: storeId,
+            },
+        });
+
+        if (!existingRating) {
+            throw new Error(messages.ratingNotFound);
+        }
+
+        await existingRating.update({ rating_value: ratingValue });
+        return existingRating;
+    }
+
+    async getStoreForUser({ userId, filters = {} }) {
+        const where = {};
+
+        if (filters.name) {
+            where.name = { [Op.iLike]: `%${filters.name}%` };
+        }
+
+        if (filters.address) {
+            where.address = { [Op.iLike]: `%${filters.address}%` };
+        }
+
+        const pageLimit = Number(filters.pageLimit || 10);
+        const page = Number(filters.page || 1);
+        const offset = (page - 1) * pageLimit;
+
+        const { rows, count } = await Store.findAndCountAll({
+            where,
+            attributes: {
+                include: [[fn("COALESCE", fn("AVG", col("Ratings.rating_value")), 0), "overallRating"]],
+            },
+            include: [
+                {
+                    model: Rating,
+                    attributes: [],
+                    required: false,
+                },
+            ],
+            group: ["Store.id"],
+            order: [["createdAt", "DESC"]],
+            subQuery: false,
+            limit: pageLimit,
+            offset,
+        });
+
+        const storeIds = rows.map((store) => store.id);
+        const ratings = storeIds.length
+            ? await Rating.findAll({
+                where: {
+                    user_id: userId,
+                    store_id: { [Op.in]: storeIds },
+                },
+                attributes: ["store_id", "rating_value"],
+            })
+            : [];
+
+        const ratingByStoreId = new Map(ratings.map((rating) => [rating.store_id, rating.rating_value]));
+
+        const list = rows.map((store) => ({
+            name: store.name,
+            address: store.address,
+            overallRating: Number(store.getDataValue("overallRating")),
+            userSubmittedRating: ratingByStoreId.get(store.id) ?? null,
+        }));
+
+        const total = Array.isArray(count) ? count.length : count;
+
+        return {
+            list,
+            total,
+            page,
+            pageLimit,
+            totalPages: Math.ceil(total / pageLimit),
+        };
+    }
+
     async updateProfile({ userId, name, address, password }) {
         const user = await User.findByPk(userId);
 

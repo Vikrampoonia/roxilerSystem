@@ -2,7 +2,15 @@ import Result from "../constant/result.js";
 import userService from "../service/userService.js";
 import constants from "../constant/constants.js";
 import messages from "../constant/message.js";
-import { createUserSchema, getUserByIdSchema, getUserFilterSchema, updateProfileSchema } from "../utils/validation.js";
+import {
+    addRatingSchema,
+    createUserSchema,
+    getStoreForUserFilterSchema,
+    getUserByIdSchema,
+    getUserFilterSchema,
+    updateProfileSchema,
+    updateRatingSchema,
+} from "../utils/validation.js";
 
 
 class UserController {
@@ -78,6 +86,97 @@ class UserController {
             return res;
         }
     }
+
+    async addRating({ userId, store_id, rating_value }) {
+        const res = new Result();
+        const { httpStatus } = constants;
+
+        try {
+            const validationResult = addRatingSchema.safeParse({ store_id, rating_value });
+
+            if (!validationResult.success) {
+                res.status = httpStatus.badRequest;
+                res.message = validationResult.error.issues[0]?.message || messages.invalidSignupCredentials;
+                return res;
+            }
+
+            const data = await userService.addRating({
+                userId,
+                storeId: validationResult.data.store_id,
+                ratingValue: validationResult.data.rating_value,
+            });
+
+            res.status = httpStatus.created;
+            res.message = messages.ratingAddedSuccessfully;
+            res.data = data;
+            return res;
+        } catch (err) {
+            const badRequestMessages = [messages.storeNotFound, messages.ratingAlreadySubmitted];
+            res.status = badRequestMessages.includes(err.message) ? httpStatus.badRequest : httpStatus.serverError;
+            res.message = err.message || messages.unableToSignup;
+            return res;
+        }
+    }
+
+    async updateRating({ userId, store_id, rating_value }) {
+        const res = new Result();
+        const { httpStatus } = constants;
+
+        try {
+            const validationResult = updateRatingSchema.safeParse({ store_id, rating_value });
+
+            if (!validationResult.success) {
+                res.status = httpStatus.badRequest;
+                res.message = validationResult.error.issues[0]?.message || messages.invalidSignupCredentials;
+                return res;
+            }
+
+            const data = await userService.updateRating({
+                userId,
+                storeId: validationResult.data.store_id,
+                ratingValue: validationResult.data.rating_value,
+            });
+
+            res.status = httpStatus.success;
+            res.message = messages.ratingUpdatedSuccessfully;
+            res.data = data;
+            return res;
+        } catch (err) {
+            res.status = err.message === messages.ratingNotFound ? httpStatus.notFound : httpStatus.serverError;
+            res.message = err.message || messages.unableToSignup;
+            return res;
+        }
+    }
+
+    async getStoreForUser({ userId, filters }) {
+        const res = new Result();
+        const { httpStatus } = constants;
+
+        try {
+            const validationResult = getStoreForUserFilterSchema.safeParse(filters);
+
+            if (!validationResult.success) {
+                res.status = httpStatus.badRequest;
+                res.message = validationResult.error.issues[0]?.message || messages.invalidSignupCredentials;
+                return res;
+            }
+
+            const data = await userService.getStoreForUser({
+                userId,
+                filters: validationResult.data || {},
+            });
+
+            res.status = httpStatus.success;
+            res.message = messages.userStoresFetchedSuccessfully;
+            res.data = data;
+            return res;
+        } catch (err) {
+            res.status = httpStatus.serverError;
+            res.message = err.message || messages.unableToSignup;
+            return res;
+        }
+    }
+
     async updateProfile({ userId, name, address, password }) {
         const res = new Result();
         const { httpStatus } = constants;
