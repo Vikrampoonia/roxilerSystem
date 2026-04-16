@@ -45,6 +45,10 @@ export const getUserFilterSchema = z
     })
     .optional();
 
+export const getUserByIdSchema = z.object({
+    id: z.coerce.number().int().positive(),
+});
+
 export const createStoreSchema = z.object({
     name: z.string().min(1).max(60),
     email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid),

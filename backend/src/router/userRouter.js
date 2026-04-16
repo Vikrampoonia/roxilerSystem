@@ -17,6 +17,12 @@ router.get("/get-user", auth, authorize(constants.roles.systemAdministrator), as
     res.status(data.status).send(data);
 });
 
+router.get("/get-user/:id", auth, authorize(constants.roles.systemAdministrator), async (req, res) => {
+    const { id } = req.params;
+    const data = await userController.getUserById({ userId: id });
+    res.status(data.status).send(data);
+});
+
 router.put("/update-profile", auth, async (req, res) => {
     const { name, address, password } = req.body;
     const userId = req.user.id;

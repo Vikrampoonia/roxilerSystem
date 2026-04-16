@@ -2,7 +2,7 @@ import Result from "../constant/result.js";
 import userService from "../service/userService.js";
 import constants from "../constant/constants.js";
 import messages from "../constant/message.js";
-import { createUserSchema, getUserFilterSchema, updateProfileSchema } from "../utils/validation.js";
+import { createUserSchema, getUserByIdSchema, getUserFilterSchema, updateProfileSchema } from "../utils/validation.js";
 
 
 class UserController {
@@ -49,6 +49,31 @@ class UserController {
             return res;
         } catch (err) {
             res.status = httpStatus.serverError;
+            res.message = err.message || messages.unableToSignup;
+            return res;
+        }
+    }
+
+    async getUserById({ userId }) {
+        const res = new Result();
+        const { httpStatus } = constants;
+
+        try {
+            const validationResult = getUserByIdSchema.safeParse({ id: userId });
+
+            if (!validationResult.success) {
+                res.status = httpStatus.badRequest;
+                res.message = validationResult.error.issues[0]?.message || messages.invalidSignupCredentials;
+                return res;
+            }
+
+            const data = await userService.getUserById({ userId: validationResult.data.id });
+            res.status = httpStatus.success;
+            res.message = messages.userDetailFetchedSuccessfully;
+            res.data = data;
+            return res;
+        } catch (err) {
+            res.status = err.message === messages.userNotFound ? httpStatus.notFound : httpStatus.serverError;
             res.message = err.message || messages.unableToSignup;
             return res;
         }

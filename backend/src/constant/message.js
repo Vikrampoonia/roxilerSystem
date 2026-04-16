@@ -11,6 +11,7 @@ class Message {
         this.unableToLogout = "Unable to logout";
         this.userCreatedSuccessfully = "User created successfully";
         this.usersFetchedSuccessfully = "Users fetched successfully";
+        this.userDetailFetchedSuccessfully = "User detail fetched successfully";
         this.storeCreatedSuccessfully = "Store created successfully";
         this.storesFetchedSuccessfully = "Stores fetched successfully";
         this.dashboardSummaryFetchedSuccessfully = "Dashboard summary fetched successfully";
