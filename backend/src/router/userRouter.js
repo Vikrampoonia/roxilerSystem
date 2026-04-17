@@ -12,7 +12,7 @@ router.post("/create-user", auth, authorize(constants.roles.systemAdministrator)
 });
 
 router.get("/get-user", auth, authorize(constants.roles.systemAdministrator), async (req, res) => {
-    const { filters } = req.query;
+    const filters = req.query;
     const data = await userController.getUser({ filters });
     res.status(data.status).send(data);
 });

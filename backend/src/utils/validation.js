@@ -41,7 +41,9 @@ export const getUserFilterSchema = z
         address: z.string().optional(),
         role: z.enum([constants.roles.systemAdministrator, constants.roles.normalUser, constants.roles.storeOwner]).optional(),
         page: z.coerce.number().int().min(1).optional(),
-        pageLimit: z.coerce.number().int().min(1).max(100).optional(),
+        pageLimit: z.coerce.number().int().min(10).max(100).optional(),
+        sortBy: z.enum(["name", "email"]).optional(),
+        sortOrder: z.enum(["asc", "desc"]).optional(),
     })
     .optional();
 
@@ -64,14 +66,18 @@ export const getStoreForUserFilterSchema = z
         name: z.string().optional(),
         address: z.string().optional(),
         page: z.coerce.number().int().min(1).optional(),
-        pageLimit: z.coerce.number().int().min(1).max(100).optional(),
+        pageLimit: z.coerce.number().int().min(10).max(100).optional(),
+        sortBy: z.enum(["name"]).optional(),
+        sortOrder: z.enum(["asc", "desc"]).optional(),
     })
     .optional();
 
 export const storeRatingsSummaryFilterSchema = z
     .object({
         page: z.coerce.number().int().min(1).optional(),
-        pageLimit: z.coerce.number().int().min(1).max(100).optional(),
+        pageLimit: z.coerce.number().int().min(10).max(100).optional(),
+        sortBy: z.enum(["name", "email"]).optional(),
+        sortOrder: z.enum(["asc", "desc"]).optional(),
     })
     .optional();
 
@@ -88,7 +94,9 @@ export const getStoreFilterSchema = z
         email: z.string().regex(EMAIL_REGEX, messages.validation.emailInvalid).optional(),
         address: z.string().optional(),
         page: z.coerce.number().int().min(1).optional(),
-        pageLimit: z.coerce.number().int().min(1).max(100).optional(),
+        pageLimit: z.coerce.number().int().min(10).max(100).optional(),
+        sortBy: z.enum(["name", "email"]).optional(),
+        sortOrder: z.enum(["asc", "desc"]).optional(),
     })
     .optional();
 

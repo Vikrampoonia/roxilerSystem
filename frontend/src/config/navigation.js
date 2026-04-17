@@ -7,6 +7,8 @@ export const ROLES = {
 export const sidebarItemsByRole = {
     [ROLES.SYSTEM_ADMINISTRATOR]: [
         { id: "admin-dashboard", name: "Dashboard", path: "/dashboard/admin" },
+        { id: "admin-users", name: "Users", path: "/dashboard/admin/users" },
+        { id: "admin-stores", name: "Stores", path: "/dashboard/admin/stores" },
         { id: "profile", name: "Profile", path: "/profile" },
     ],
     [ROLES.NORMAL_USER]: [

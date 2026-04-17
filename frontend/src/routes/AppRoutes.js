@@ -5,6 +5,8 @@ import ProtectedRoute from "../components/guards/ProtectedRoute";
 import RoleRoute from "../components/guards/RoleRoute";
 import AppShell from "../components/layout/AppShell";
 import AdminDashboardPage from "../pages/dashboard/AdminDashboardPage";
+import AdminStoresPage from "../pages/dashboard/AdminStoresPage";
+import AdminUsersPage from "../pages/dashboard/AdminUsersPage";
 import StoreOwnerDashboardPage from "../pages/dashboard/StoreOwnerDashboardPage";
 import UserDashboardPage from "../pages/dashboard/UserDashboardPage";
 import LoginPage from "../pages/auth/LoginPage";
@@ -31,6 +33,8 @@ function AppRoutes() {
 
                     <Route element={<RoleRoute allowedRoles={[ROLES.SYSTEM_ADMINISTRATOR]} />}>
                         <Route path="dashboard/admin" element={<AdminDashboardPage />} />
+                        <Route path="dashboard/admin/users" element={<AdminUsersPage />} />
+                        <Route path="dashboard/admin/stores" element={<AdminStoresPage />} />
                     </Route>
 
                     <Route element={<RoleRoute allowedRoles={[ROLES.NORMAL_USER]} />}>

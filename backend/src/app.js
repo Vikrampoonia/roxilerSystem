@@ -8,6 +8,17 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use((req, res, next) => {
+    const startedAt = Date.now();
+
+    res.on('finish', () => {
+        const duration = Date.now() - startedAt;
+        console.log(`${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`);
+    });
+
+    next();
+});
+
 const PORT = process.env.PORT || 5001;
 
 const startServer = async () => {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { validateAddress, validateEmail, validateName, validatePassword } from "../../utils/validation";
 
 function SignUpPage() {
     const { signUp } = useAuth();
@@ -23,6 +24,18 @@ function SignUpPage() {
         event.preventDefault();
         setIsSubmitting(true);
         setErrorMessage("");
+
+        const nameError = validateName(formData.name);
+        const emailError = validateEmail(formData.email);
+        const addressError = validateAddress(formData.address);
+        const passwordError = validatePassword(formData.password);
+        const firstError = nameError || emailError || addressError || passwordError;
+
+        if (firstError) {
+            setErrorMessage(firstError);
+            setIsSubmitting(false);
+            return;
+        }
 
         try {
             await signUp(formData);

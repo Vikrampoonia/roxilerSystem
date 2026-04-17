@@ -49,6 +49,8 @@ class StoreService {
         const pageLimit = Number(filters.pageLimit || 10);
         const page = Number(filters.page || 1);
         const offset = (page - 1) * pageLimit;
+        const sortBy = filters.sortBy || "createdAt";
+        const sortOrder = (filters.sortOrder || "desc").toUpperCase();
 
         const { rows, count } = await Store.findAndCountAll({
             where,
@@ -63,7 +65,7 @@ class StoreService {
                 },
             ],
             group: ["Store.id"],
-            order: [["createdAt", "DESC"]],
+            order: [[sortBy, sortOrder]],
             subQuery: false,
             limit: pageLimit,
             offset,

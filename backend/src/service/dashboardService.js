@@ -11,9 +11,9 @@ class DashboardService {
         ]);
 
         return {
-            totalUsers,
-            totalStores,
-            totalRatings,
+            usersCount: totalUsers,
+            storesCount: totalStores,
+            ratingsCount: totalRatings,
         };
     }
 }

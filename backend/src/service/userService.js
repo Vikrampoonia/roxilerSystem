@@ -48,11 +48,13 @@ class UserService {
         const pageLimit = Number(filters.pageLimit || 10);
         const page = Number(filters.page || 1);
         const offset = (page - 1) * pageLimit;
+        const sortBy = filters.sortBy || "createdAt";
+        const sortOrder = (filters.sortOrder || "desc").toUpperCase();
 
         const { rows, count } = await User.findAndCountAll({
             where,
             attributes: { exclude: ["password"] },
-            order: [["createdAt", "DESC"]],
+            order: [[sortBy, sortOrder]],
             limit: pageLimit,
             offset,
         });
@@ -83,22 +85,24 @@ class UserService {
 
         const store = await Store.findOne({
             where: { owner_id: userId },
-            attributes: {
-                include: [[fn("COALESCE", fn("AVG", col("Ratings.rating_value")), 0), "storeRating"]],
-            },
-            include: [
-                {
-                    model: Rating,
-                    attributes: [],
-                    required: false,
-                },
-            ],
-            group: ["Store.id"],
+        });
+
+        if (!store) {
+            return {
+                ...userData,
+                storeRating: 0,
+            };
+        }
+
+        const ratingRow = await Rating.findOne({
+            where: { store_id: store.id },
+            attributes: [[fn("COALESCE", fn("AVG", col("rating_value")), 0), "storeRating"]],
+            raw: true,
         });
 
         return {
             ...userData,
-            storeRating: store ? Number(store.getDataValue("storeRating")) : 0,
+            storeRating: Number(ratingRow?.storeRating || 0),
         };
     }
 
@@ -168,6 +172,8 @@ class UserService {
         const pageLimit = Number(filters.pageLimit || 10);
         const page = Number(filters.page || 1);
         const offset = (page - 1) * pageLimit;
+        const sortBy = filters.sortBy || "createdAt";
+        const sortOrder = (filters.sortOrder || "desc").toUpperCase();
 
         const { rows, count } = await Store.findAndCountAll({
             where,
@@ -182,7 +188,7 @@ class UserService {
                 },
             ],
             group: ["Store.id"],
-            order: [["createdAt", "DESC"]],
+            order: [[sortBy, sortOrder]],
             subQuery: false,
             limit: pageLimit,
             offset,
@@ -202,6 +208,7 @@ class UserService {
         const ratingByStoreId = new Map(ratings.map((rating) => [rating.store_id, rating.rating_value]));
 
         const list = rows.map((store) => ({
+            id: store.id,
             name: store.name,
             address: store.address,
             overallRating: Number(store.getDataValue("overallRating")),
@@ -229,6 +236,12 @@ class UserService {
         const pageLimit = Number(filters.pageLimit || 10);
         const page = Number(filters.page || 1);
         const offset = (page - 1) * pageLimit;
+        const sortBy = filters.sortBy || "createdAt";
+        const sortOrder = (filters.sortOrder || "desc").toUpperCase();
+        const order =
+            sortBy === "name" || sortBy === "email"
+                ? [[{ model: User, as: "user" }, sortBy, sortOrder]]
+                : [["createdAt", sortOrder]];
 
         const averageRatingRow = await Rating.findOne({
             where: { store_id: store.id },
@@ -246,7 +259,7 @@ class UserService {
                 },
             ],
             attributes: ["id", "rating_value", "createdAt"],
-            order: [["createdAt", "DESC"]],
+            order,
             limit: pageLimit,
             offset,
         });
