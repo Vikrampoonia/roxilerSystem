@@ -1,7 +1,7 @@
 import User from '../modals/userModals.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import redis from '../config/redis.js';
+// import redis from '../config/redis.js';
 
 class AuthService {
 
@@ -49,7 +49,7 @@ class AuthService {
 
         if (ttl > 0) {
             // Store token in Redis with calculated TTL
-            await redis.setex(`blacklist:${token}`, ttl, 'true');
+            // await redis.setex(`blacklist:${token}`, ttl, 'true');
         }
 
         return { success: true };

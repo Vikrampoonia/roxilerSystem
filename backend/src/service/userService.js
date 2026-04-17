@@ -102,6 +102,18 @@ class UserService {
         };
     }
 
+    async getProfile({ userId }) {
+        const user = await User.findByPk(userId, {
+            attributes: { exclude: ["password"] },
+        });
+
+        if (!user) {
+            throw new Error(messages.userNotFound);
+        }
+
+        return sanitizeUser(user);
+    }
+
     async addRating({ userId, storeId, ratingValue }) {
         const store = await Store.findByPk(storeId);
         if (!store) {

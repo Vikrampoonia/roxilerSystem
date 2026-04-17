@@ -12,6 +12,7 @@ class Message {
         this.userCreatedSuccessfully = "User created successfully";
         this.usersFetchedSuccessfully = "Users fetched successfully";
         this.userDetailFetchedSuccessfully = "User detail fetched successfully";
+        this.profileFetchedSuccessfully = "Profile fetched successfully";
         this.storeCreatedSuccessfully = "Store created successfully";
         this.storesFetchedSuccessfully = "Stores fetched successfully";
         this.userStoresFetchedSuccessfully = "Stores fetched successfully";

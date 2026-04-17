@@ -88,6 +88,23 @@ class UserController {
         }
     }
 
+    async getProfile({ userId }) {
+        const res = new Result();
+        const { httpStatus } = constants;
+
+        try {
+            const data = await userService.getProfile({ userId });
+            res.status = httpStatus.success;
+            res.message = messages.profileFetchedSuccessfully;
+            res.data = data;
+            return res;
+        } catch (err) {
+            res.status = err.message === messages.userNotFound ? httpStatus.notFound : httpStatus.serverError;
+            res.message = err.message || messages.unableToSignup;
+            return res;
+        }
+    }
+
     async addRating({ userId, store_id, rating_value }) {
         const res = new Result();
         const { httpStatus } = constants;

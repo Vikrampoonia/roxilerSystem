@@ -23,6 +23,11 @@ router.get("/get-user/:id", auth, authorize(constants.roles.systemAdministrator)
     res.status(data.status).send(data);
 });
 
+router.get("/profile", auth, async (req, res) => {
+    const data = await userController.getProfile({ userId: req.user.id });
+    res.status(data.status).send(data);
+});
+
 router.post("/add-rating", auth, authorize(constants.roles.normalUser), async (req, res) => {
     const { store_id, rating_value } = req.body;
     const data = await userController.addRating({
